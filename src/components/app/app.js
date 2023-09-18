@@ -67,7 +67,7 @@ export default class App extends Component {
 
 	deleteCompleted = () => {
 		this.setState(({ todoDate }) => {
-			const activeItems = this.state.todoDate.filter(el => el.done === false);
+			const activeItems = todoDate.filter(el => el.done === false);
 			return {
 				todoDate: activeItems
 			}
