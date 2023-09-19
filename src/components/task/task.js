@@ -8,20 +8,24 @@ class Task extends Component {
 		label: this.props.label
 	};
 
-	onChangeLabel = (e) => {
+	handleChangeLabel = (e) => {
 		this.setState({ label: e.target.value });
 	};
 
-	onSubmit = (e) => {
+	handleSubmit = (e) => {
 		e.preventDefault();
-		this.props.onEdited(this.state.label);
+		if (this.state.label !== '') {
+			this.props.onEdited(this.state.label);
+		} else {
+			this.props.onDeleted();
+		}
 	};
 
 	render() {
 		const { edit, done, label, date, onDeleted, onToggleDone, onToggleEdit } = this.props;
 		const formElement = (
-			<form onSubmit={this.onSubmit}>
-				<input onChange={this.onChangeLabel} type="text" className="edit" value={this.state.label} autoFocus />
+			<form onSubmit={this.handleSubmit}>
+				<input onChange={this.handleChangeLabel} type="text" className="edit" value={this.state.label} autoFocus />
 			</form>
 		);
 		return (
