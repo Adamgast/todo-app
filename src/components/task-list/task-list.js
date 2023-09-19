@@ -2,24 +2,24 @@ import Task from '../task/task';
 import PropTypes from 'prop-types';
 import './task-list.css';
 
-function TaskList({ todos, onDeleted, onToggleEdit, onToggleDone }) {
+function TaskList({ todos, onDeleted, onEdited, onToggleDone, onToggleEdit }) {
 	const elements = todos.map((item) => {
-		const { id, done, edit, ...itemProps } = item;
+		const { id, ...itemProps } = item;
 		let className = null;
-		if (done) {
+		if (itemProps.done) {
 			className = 'completed';
 		}
-		if (edit) {
+		if (itemProps.edit) {
 			className = "editing";
 		}
 
 		return (
 			<li key={id} className={className}>
-				<Task {...itemProps} checked={done}
+				<Task {...itemProps}
 					onDeleted={() => onDeleted(id)}
+					onEdited={(label) => onEdited(id, label)}
 					onToggleEdit={() => onToggleEdit(id)}
 					onToggleDone={() => onToggleDone(id)} />
-				{edit ? <input type="text" className="edit" /> : null}
 			</li>
 		);
 	});
@@ -30,6 +30,7 @@ function TaskList({ todos, onDeleted, onToggleEdit, onToggleDone }) {
 		</ul>
 	);
 }
+
 
 TaskList.defaultProps = {
 	onDeleted: () => { },

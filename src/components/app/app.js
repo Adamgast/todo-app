@@ -13,7 +13,7 @@ export default class App extends Component {
 	};
 
 	toggleProperty(arr, id, propName) {
-		const index = arr.findIndex((item) => item.id === id);
+		const index = this.searchIdxItem(arr, id);
 		const oldItem = arr[index];
 		return [
 			...arr.slice(0, index),
@@ -30,6 +30,10 @@ export default class App extends Component {
 			edit: false,
 			date: new Date(),
 		}
+	}
+
+	searchIdxItem(arr, id) {
+		return arr.findIndex(item => item.id === id);
 	}
 
 	onToggleEdit = (id) => {
@@ -55,9 +59,22 @@ export default class App extends Component {
 		})
 	}
 
+	editItem = (id, label) => {
+		this.setState(({ todoDate }) => {
+			const index = this.searchIdxItem(todoDate, id);
+			const oldItem = todoDate[index];
+			const newDate = [
+				...todoDate.slice(0, index),
+				{ ...oldItem, label: label, edit: !oldItem.edit },
+				...todoDate.slice(index + 1)
+			];
+			return { todoDate: newDate }
+		})
+	}
+
 	deleteItem = (id) => {
 		this.setState(({ todoDate }) => {
-			const index = todoDate.findIndex((item) => item.id === id);
+			const index = this.searchIdxItem(todoDate, id);
 			const newDate = [
 				...todoDate.slice(0, index),
 				...todoDate.slice(index + 1)
@@ -106,6 +123,7 @@ export default class App extends Component {
 				<section className="main">
 					<TaskList todos={this.filteredDate()}
 						onDeleted={this.deleteItem}
+						onEdited={this.editItem}
 						onToggleEdit={this.onToggleEdit}
 						onToggleDone={this.onToggleDone} />
 

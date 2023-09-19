@@ -11,14 +11,17 @@ function Footer({ todoCount, onClear, filter, onChangeFilter }) {
 		</footer>
 	);
 }
-Footer.defaulProps = {
+
+Footer.defaultProps = {
 	todoCount: 0,
 	onClear: () => { },
 	onChangeFilter: () => { },
 }
+
 Footer.propTypes = {
 	todoCount: PropTypes.number,
 	onClear: PropTypes.func,
 	onChangeFilter: PropTypes.func,
 }
+
 export default Footer;
