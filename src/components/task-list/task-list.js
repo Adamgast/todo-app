@@ -30,4 +30,11 @@ function TaskList({ todos, onDeleted, onToggleEdit, onToggleDone }) {
 	);
 }
 
+TaskList.defaultProps = {
+	onDeleted: () => { },
+	onToggleEdit: () => { },
+	onToggleDone: () => { },
+	todos: []
+}
+
 export default TaskList;

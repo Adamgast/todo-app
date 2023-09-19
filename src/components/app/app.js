@@ -108,7 +108,7 @@ export default class App extends Component {
 						onToggleEdit={this.onToggleEdit}
 						onToggleDone={this.onToggleDone} />
 
-					<Footer toDo={todoCount}
+					<Footer todoCount={todoCount}
 						onClear={this.deleteCompleted}
 						filter={this.state.filter}
 						onChangeFilter={this.changeFilter}

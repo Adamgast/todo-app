@@ -2,6 +2,9 @@ import { Component } from 'react';
 import './tasks-filter.css';
 
 export default class TasksFilter extends Component {
+	static defaulProps = {
+		filter: 'ALL',
+	}
 	render() {
 		const { filter } = this.props;
 		return (
