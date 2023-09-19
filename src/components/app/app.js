@@ -27,7 +27,8 @@ export default class App extends Component {
 			id: this.maxId++,
 			label,
 			done: false,
-			edit: false
+			edit: false,
+			date: new Date(),
 		}
 	}
 
