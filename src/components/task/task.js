@@ -4,52 +4,67 @@ import { Component } from 'react';
 import './task.css';
 
 class Task extends Component {
-	state = {
-		label: this.props.label
-	};
+  constructor(props) {
+    super();
+    this.label = props.todo.label;
+    this.state = {
+      labelState: this.label,
+    };
+  }
 
-	handleChangeLabel = (e) => {
-		this.setState({ label: e.target.value });
-	};
+  handleChangeLabel = (e) => {
+    this.setState({ labelState: e.target.value });
+  };
 
-	handleSubmit = (e) => {
-		e.preventDefault();
-		if (this.state.label !== '') {
-			this.props.onEdited(this.state.label);
-		} else {
-			this.props.onDeleted();
-		}
-	};
+  handleSubmit = (e) => {
+    const { labelState } = this.state;
+    const { onEdited, onDeleted } = this.props;
+    e.preventDefault();
+    if (labelState !== '') {
+      onEdited(labelState);
+    } else {
+      onDeleted();
+    }
+  };
 
-	render() {
-		const { edit, done, label, date, onDeleted, onToggleDone, onToggleEdit } = this.props;
-		const formElement = (
-			<form onSubmit={this.handleSubmit}>
-				<input onChange={this.handleChangeLabel} type="text" className="edit" value={this.state.label} autoFocus />
-			</form>
-		);
-		return (
-			<div>
-				<div className="view">
-					<input className="toggle" type="checkbox" checked={done} onChange={onToggleDone} />
-					<label>
-						<span className="description">{label}</span>
-						<span className="created">created {formatDistanceToNow(date, { includeSeconds: true })} ago</span>
-					</label>
-					<button className="icon icon-edit" onClick={onToggleEdit}></button>
-					<button className="icon icon-destroy" onClick={onDeleted}></button>
-				</div>
-				{edit ? formElement : null}
-			</div>
-		);
-	}
+  render() {
+    const { todo, onDeleted, onToggleDone, onToggleEdit } = this.props;
+    const { id, edit, done, label, date } = todo;
+    const { labelState } = this.state;
+    const formElement = (
+      <form onSubmit={this.handleSubmit}>
+        <input onChange={this.handleChangeLabel} type="text" className="edit" value={labelState} />
+      </form>
+    );
+    return (
+      <div>
+        <div className="view">
+          <input id={id} className="toggle" type="checkbox" checked={done} onChange={onToggleDone} />
+          <label htmlFor={id}>
+            <span className="description">{label}</span>
+            <span className="created">created {formatDistanceToNow(date, { includeSeconds: true })} ago</span>
+          </label>
+          <button aria-label="edit" type="button" className="icon icon-edit" onClick={onToggleEdit} />
+          <button aria-label="delete" type="button" className="icon icon-destroy" onClick={onDeleted} />
+        </div>
+        {edit ? formElement : null}
+      </div>
+    );
+  }
 }
+
+Task.defaultProps = {
+  todo: {},
+};
 
 Task.propTypes = {
-	done: PropTypes.bool,
-	edit: PropTypes.bool,
-	label: PropTypes.string,
-	date: PropTypes.instanceOf(Date),
-}
+  todo: PropTypes.shape({
+    id: PropTypes.number,
+    done: PropTypes.bool,
+    edit: PropTypes.bool,
+    label: PropTypes.string,
+    date: PropTypes.instanceOf(Date),
+  }),
+};
 
 export default Task;
