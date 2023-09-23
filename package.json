@@ -1,5 +1,4 @@
 {
-  "homepage": "https://adamgast.github.io/todo-app/",
   "name": "todo-app",
   "version": "0.1.0",
   "private": true,
@@ -46,7 +45,6 @@
   "devDependencies": {
     "@babel/core": "^7.22.20",
     "@babel/eslint-parser": "^7.22.15",
-    "@babel/preset-react": "^7.22.15",
     "eslint": "^8.50.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^9.0.0",
