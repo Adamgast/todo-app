@@ -3,36 +3,45 @@ import PropTypes from 'prop-types';
 import './new-task-form.css';
 
 export default class NewTaskForm extends Component {
-	static defaultProps = {
-		onAdded: () => { },
-	}
-	static propTypes = {
-		onAdded: PropTypes.func,
-	}
+  constructor() {
+    super();
+    this.state = {
+      label: '',
+    };
+  }
 
-	state = {
-		label: ''
-	};
+  handleLabelChange = (e) => {
+    this.setState({
+      label: e.target.value,
+    });
+  };
 
-	handleLabelChange = (e) => {
-		this.setState({
-			label: e.target.value
-		});
-	};
-
-	handleSubmit = (e) => {
-		e.preventDefault();
-		if (this.state.label.trim()) {
-			this.props.onAdded(this.state.label);
-		}
-		this.setState({ label: '' });
-	};
-
-	render() {
-		return (
-			<form onSubmit={this.handleSubmit} >
-				<input onChange={this.handleLabelChange} className="new-todo" placeholder="What needs to be done?" value={this.state.label} autoFocus />
-			</form>
-		);
-	}
+  render() {
+    const { onAdded } = this.props;
+    const { label } = this.state;
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      if (label.trim()) {
+        onAdded(label);
+      }
+      this.setState({ label: '' });
+    };
+    return (
+      <form onSubmit={handleSubmit}>
+        <input
+          onChange={this.handleLabelChange}
+          className="new-todo"
+          placeholder="What needs to be done?"
+          value={label}
+        />
+      </form>
+    );
+  }
 }
+NewTaskForm.defaultProps = {
+  onAdded: () => {},
+};
+
+NewTaskForm.propTypes = {
+  onAdded: PropTypes.func,
+};
