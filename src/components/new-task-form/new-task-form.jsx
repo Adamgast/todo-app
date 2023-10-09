@@ -7,6 +7,8 @@ export default class NewTaskForm extends Component {
     super();
     this.state = {
       label: '',
+      min: '',
+      sec: '',
     };
   }
 
@@ -16,15 +18,27 @@ export default class NewTaskForm extends Component {
     });
   };
 
+  handleMinChange = (e) => {
+    this.setState({
+      min: e.target.value,
+    });
+  };
+
+  handleSecChange = (e) => {
+    this.setState({
+      sec: e.target.value,
+    });
+  };
+
   render() {
     const { onAdded } = this.props;
-    const { label } = this.state;
+    const { label, min, sec } = this.state;
     const handleSubmit = (e) => {
       e.preventDefault();
       if (label.trim()) {
-        onAdded(label);
+        onAdded(label, min, sec);
       }
-      this.setState({ label: '' });
+      this.setState({ label: '', min: '', sec: '' });
     };
     return (
       <form className="new-todo-form" onSubmit={handleSubmit}>
@@ -34,8 +48,23 @@ export default class NewTaskForm extends Component {
           placeholder="What needs to be done?"
           value={label}
         />
-        <input className="new-todo-form__timer" placeholder="Min" />
-        <input className="new-todo-form__timer" placeholder="Sec" />
+        <input
+          onChange={this.handleMinChange}
+          value={min}
+          type="number"
+          max="59"
+          className="new-todo-form__timer"
+          placeholder="Min"
+        />
+        <input
+          onChange={this.handleSecChange}
+          value={sec}
+          type="number"
+          max="59"
+          className="new-todo-form__timer"
+          placeholder="Sec"
+        />
+        <button aria-label="submit button" className="hidden" type="submit" />
       </form>
     );
   }

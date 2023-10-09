@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Task from '../task/task';
 import './task-list.css';
 
-function TaskList({ todos, onDeleted, onEdited, onToggleDone, onToggleEdit }) {
+function TaskList({ todos, onDeleted, onEdited, onToggleDone, onToggleEdit, onUploadTimer }) {
   const elements = todos.map((item) => {
     const { id } = item;
     let className = null;
@@ -22,6 +22,7 @@ function TaskList({ todos, onDeleted, onEdited, onToggleDone, onToggleEdit }) {
           onEdited={(label) => onEdited(id, label)}
           onToggleEdit={() => onToggleEdit(id)}
           onToggleDone={() => onToggleDone(id)}
+          onUploadTimer={(min, sec) => onUploadTimer(id, min, sec)}
         />
       </li>
     );

@@ -33,9 +33,18 @@ export default class App extends Component {
     }));
   };
 
-  addItem = (label) => {
+  uploadTimer = (id, min, sec) => {
     this.setState(({ todoDate }) => {
-      const newDate = [...todoDate, this.createToDoItem(label)];
+      const index = this.searchIdxItem(todoDate, id);
+      const oldItem = todoDate[index];
+      const newDate = [...todoDate.slice(0, index), { ...oldItem, min, sec }, ...todoDate.slice(index + 1)];
+      return { todoDate: newDate };
+    });
+  };
+
+  addItem = (label, min, sec) => {
+    this.setState(({ todoDate }) => {
+      const newDate = [...todoDate, this.createToDoItem(label, min, sec)];
       return { todoDate: newDate };
     });
   };
@@ -88,7 +97,7 @@ export default class App extends Component {
     return arr.findIndex((item) => item.id === id);
   }
 
-  createToDoItem(label) {
+  createToDoItem(label, min, sec) {
     return {
       // eslint-disable-next-line no-plusplus
       id: this.maxId++,
@@ -96,6 +105,8 @@ export default class App extends Component {
       done: false,
       edit: false,
       date: new Date(),
+      min,
+      sec,
     };
   }
 
@@ -122,6 +133,7 @@ export default class App extends Component {
             onEdited={this.editItem}
             onToggleEdit={this.onToggleEdit}
             onToggleDone={this.onToggleDone}
+            onUploadTimer={this.uploadTimer}
           />
 
           <Footer

@@ -80,6 +80,7 @@
 	transition: color 0.4s;
 	font-weight: 400;
 	color: #4d4d4d;
+	width: 130px;
 }
 
 .todo-list li.completed label .title {
@@ -149,6 +150,11 @@
 
 .todo-list li.editing:last-child {
 	margin-bottom: -1px;
+}
+
+.timer {
+	display: inline-block;
+	margin-left: 5px;
 }
 
 .toggle-all {

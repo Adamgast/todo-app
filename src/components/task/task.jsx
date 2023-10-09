@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/control-has-associated-label */
 import { formatDistanceToNow } from 'date-fns';
 import PropTypes from 'prop-types';
 import { Component } from 'react';
@@ -6,12 +5,51 @@ import './task.css';
 
 class Task extends Component {
   constructor(props) {
-    super();
-    this.label = props.todo.label;
+    super(props);
+    this.timer = null;
     this.state = {
-      labelState: this.label,
+      labelState: props.todo.label,
+      min: props.todo.min,
+      sec: props.todo.sec,
+      pause: false,
+      play: true,
     };
   }
+
+  componentDidMount() {
+    this.timer = setInterval(this.updateTime, 1000);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { onUploadTimer } = this.props;
+    const { min, sec } = this.state;
+    if (prevState.sec !== sec) {
+      onUploadTimer(min, sec);
+    }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timer);
+  }
+
+  updateTime = () => {
+    const { sec } = this.state;
+    // eslint-disable-next-line no-shadow
+    this.setState(({ sec }) => ({ sec: Number(sec) + 1 }));
+    if (sec === 59) {
+      this.setState(({ min }) => ({ sec: 0, min: Number(min) + 1 }));
+    }
+  };
+
+  pauseFn = () => {
+    clearInterval(this.timer);
+    this.setState({ pause: true, play: false });
+  };
+
+  playFn = () => {
+    this.timer = setInterval(this.updateTime, 1000);
+    this.setState({ pause: false, play: true });
+  };
 
   handleChangeLabel = (e) => {
     this.setState({ labelState: e.target.value });
@@ -30,8 +68,8 @@ class Task extends Component {
 
   render() {
     const { todo, onDeleted, onToggleDone, onToggleEdit } = this.props;
-    const { id, edit, done, label, date } = todo;
-    const { labelState } = this.state;
+    const { id, edit, done, label, date, min, sec } = todo;
+    const { labelState, play, pause } = this.state;
     const formElement = (
       <form onSubmit={this.handleSubmit}>
         <input onChange={this.handleChangeLabel} type="text" className="edit" value={labelState} />
@@ -44,9 +82,23 @@ class Task extends Component {
           <label htmlFor={id}>
             <span className="title">{label}</span>
             <span className="description">
-              <button className="icon icon-play" type="button" />
-              <button className="icon icon-pause" type="button" />
-              12:25
+              <button
+                className="icon icon-play"
+                type="button"
+                aria-label="play button"
+                disabled={play}
+                onClick={this.playFn}
+              />
+              <button
+                className="icon icon-pause"
+                type="button"
+                aria-label="pause button"
+                disabled={pause}
+                onClick={this.pauseFn}
+              />
+              <span className="timer">
+                {min.toString().padStart(2, '0')}:{sec.toString().padStart(2, '0')}
+              </span>
             </span>
             <span className="description">created {formatDistanceToNow(date, { includeSeconds: true })} ago</span>
           </label>
