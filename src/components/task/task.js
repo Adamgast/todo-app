@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/control-has-associated-label */
 import { formatDistanceToNow } from 'date-fns';
 import PropTypes from 'prop-types';
 import { Component } from 'react';
@@ -41,8 +42,13 @@ class Task extends Component {
         <div className="view">
           <input id={id} className="toggle" type="checkbox" checked={done} onChange={onToggleDone} />
           <label htmlFor={id}>
-            <span className="description">{label}</span>
-            <span className="created">created {formatDistanceToNow(date, { includeSeconds: true })} ago</span>
+            <span className="title">{label}</span>
+            <span className="description">
+              <button className="icon icon-play" type="button" />
+              <button className="icon icon-pause" type="button" />
+              12:25
+            </span>
+            <span className="description">created {formatDistanceToNow(date, { includeSeconds: true })} ago</span>
           </label>
           <button aria-label="edit" type="button" className="icon icon-edit" onClick={onToggleEdit} />
           <button aria-label="delete" type="button" className="icon icon-destroy" onClick={onDeleted} />

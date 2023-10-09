@@ -27,13 +27,15 @@ export default class NewTaskForm extends Component {
       this.setState({ label: '' });
     };
     return (
-      <form onSubmit={handleSubmit}>
+      <form className="new-todo-form" onSubmit={handleSubmit}>
         <input
           onChange={this.handleLabelChange}
           className="new-todo"
           placeholder="What needs to be done?"
           value={label}
         />
+        <input className="new-todo-form__timer" placeholder="Min" />
+        <input className="new-todo-form__timer" placeholder="Sec" />
       </form>
     );
   }
