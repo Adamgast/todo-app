@@ -11,13 +11,9 @@ class Task extends Component {
       labelState: props.todo.label,
       min: props.todo.min,
       sec: props.todo.sec,
-      pause: false,
-      play: true,
+      pause: true,
+      play: false,
     };
-  }
-
-  componentDidMount() {
-    this.timer = setInterval(this.updateTime, 1000);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -83,14 +79,14 @@ class Task extends Component {
             <span className="title">{label}</span>
             <span className="description">
               <button
-                className="icon icon-play"
+                className={`icon icon-play ${play ? 'hidden' : ''}`}
                 type="button"
                 aria-label="play button"
                 disabled={play}
                 onClick={this.playFn}
               />
               <button
-                className="icon icon-pause"
+                className={`icon icon-pause ${pause ? 'hidden' : ''}`}
                 type="button"
                 aria-label="pause button"
                 disabled={pause}
