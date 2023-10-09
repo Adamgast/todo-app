@@ -66,11 +66,13 @@ class Task extends Component {
     const { todo, onDeleted, onToggleDone, onToggleEdit } = this.props;
     const { id, edit, done, label, date, min, sec } = todo;
     const { labelState, play, pause } = this.state;
+
     const formElement = (
       <form onSubmit={this.handleSubmit}>
         <input onChange={this.handleChangeLabel} type="text" className="edit" value={labelState} />
       </form>
     );
+
     return (
       <div>
         <div className="view">
