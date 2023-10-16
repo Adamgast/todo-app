@@ -33,11 +33,24 @@ export default class App extends Component {
     }));
   };
 
-  uploadTimer = (id, min, sec) => {
+  uploadTimer = (id) => {
     this.setState(({ todoDate }) => {
       const index = this.searchIdxItem(todoDate, id);
       const oldItem = todoDate[index];
-      const newDate = [...todoDate.slice(0, index), { ...oldItem, min, sec }, ...todoDate.slice(index + 1)];
+      const { min, sec } = oldItem;
+      let newDate = [...todoDate.slice(0, index), { ...oldItem, min, sec: sec + 1 }, ...todoDate.slice(index + 1)];
+      if (sec === 59) {
+        newDate = [...todoDate.slice(0, index), { ...oldItem, min: min + 1, sec: 0 }, ...todoDate.slice(index + 1)];
+      }
+      return { todoDate: newDate };
+    });
+  };
+
+  editTimerId = (id, timerId) => {
+    this.setState(({ todoDate }) => {
+      const index = this.searchIdxItem(todoDate, id);
+      const oldItem = todoDate[index];
+      const newDate = [...todoDate.slice(0, index), { ...oldItem, timerId }, ...todoDate.slice(index + 1)];
       return { todoDate: newDate };
     });
   };
@@ -105,8 +118,9 @@ export default class App extends Component {
       done: false,
       edit: false,
       date: new Date(),
-      min,
-      sec,
+      timerId: 0,
+      min: Number(min),
+      sec: Number(sec),
     };
   }
 
@@ -134,6 +148,7 @@ export default class App extends Component {
             onToggleEdit={this.onToggleEdit}
             onToggleDone={this.onToggleDone}
             onUploadTimer={this.uploadTimer}
+            onEditTimerId={this.editTimerId}
           />
 
           <Footer

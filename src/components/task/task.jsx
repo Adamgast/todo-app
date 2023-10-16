@@ -6,45 +6,42 @@ import './task.css';
 class Task extends Component {
   constructor(props) {
     super(props);
-    this.timer = null;
+    this.timer = props.todo.timerId;
+    this.timeout = null;
     this.state = {
       labelState: props.todo.label,
-      min: props.todo.min,
-      sec: props.todo.sec,
-      pause: true,
-      play: false,
+      finalDelete: false,
+      pause: !this.timer,
+      play: this.timer,
     };
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    const { onUploadTimer } = this.props;
-    const { min, sec } = this.state;
-    if (prevState.sec !== sec) {
-      onUploadTimer(min, sec);
-    }
-  }
-
   componentWillUnmount() {
-    clearInterval(this.timer);
-  }
-
-  updateTime = () => {
-    const { sec } = this.state;
-    // eslint-disable-next-line no-shadow
-    this.setState(({ sec }) => ({ sec: Number(sec) + 1 }));
-    if (sec === 59) {
-      this.setState(({ min }) => ({ sec: 0, min: Number(min) + 1 }));
+    const { finalDelete } = this.state;
+    if (finalDelete) {
+      clearInterval(this.timer);
+      clearTimeout(this.timeout);
     }
-  };
+  }
 
   pauseFn = () => {
+    const { onEditTimerId } = this.props;
+    onEditTimerId(0);
     clearInterval(this.timer);
     this.setState({ pause: true, play: false });
   };
 
   playFn = () => {
-    this.timer = setInterval(this.updateTime, 1000);
+    const { onUploadTimer, onEditTimerId } = this.props;
+    this.timer = setInterval(onUploadTimer, 1000);
+    onEditTimerId(this.timer);
     this.setState({ pause: false, play: true });
+  };
+
+  handleDeleteItem = () => {
+    const { onDeleted } = this.props;
+    this.setState({ finalDelete: true });
+    this.timeout = setTimeout(() => onDeleted(), 100);
   };
 
   handleChangeLabel = (e) => {
@@ -53,17 +50,17 @@ class Task extends Component {
 
   handleSubmit = (e) => {
     const { labelState } = this.state;
-    const { onEdited, onDeleted } = this.props;
+    const { onEdited } = this.props;
     e.preventDefault();
     if (labelState !== '') {
       onEdited(labelState);
     } else {
-      onDeleted();
+      this.handleDeleteItem();
     }
   };
 
   render() {
-    const { todo, onDeleted, onToggleDone, onToggleEdit } = this.props;
+    const { todo, onToggleDone, onToggleEdit } = this.props;
     const { id, edit, done, label, date, min, sec } = todo;
     const { labelState, play, pause } = this.state;
 
@@ -101,7 +98,7 @@ class Task extends Component {
             <span className="description">created {formatDistanceToNow(date, { includeSeconds: true })} ago</span>
           </label>
           <button aria-label="edit" type="button" className="icon icon-edit" onClick={onToggleEdit} />
-          <button aria-label="delete" type="button" className="icon icon-destroy" onClick={onDeleted} />
+          <button aria-label="delete" type="button" className="icon icon-destroy" onClick={this.handleDeleteItem} />
         </div>
         {edit ? formElement : null}
       </div>
