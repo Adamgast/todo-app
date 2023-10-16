@@ -11,8 +11,8 @@ class Task extends Component {
     this.state = {
       labelState: props.todo.label,
       finalDelete: false,
-      pause: !this.timer,
-      play: this.timer,
+      pause: Boolean(!this.timer),
+      play: Boolean(this.timer),
     };
   }
 
