@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types';
 import './tasks-filter.css';
 
-function TasksFilter(props) {
-  const { filter, onChangeFilter } = props;
+function TasksFilter({ filter, onChangeFilter }) {
   return (
     <ul className="filters">
       <li>

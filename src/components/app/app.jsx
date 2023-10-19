@@ -37,11 +37,18 @@ export default class App extends Component {
     this.setState(({ todoDate }) => {
       const index = this.searchIdxItem(todoDate, id);
       const oldItem = todoDate[index];
-      const { min, sec } = oldItem;
-      let newDate = [...todoDate.slice(0, index), { ...oldItem, min, sec: sec + 1 }, ...todoDate.slice(index + 1)];
-      if (sec === 59) {
-        newDate = [...todoDate.slice(0, index), { ...oldItem, min: min + 1, sec: 0 }, ...todoDate.slice(index + 1)];
+      let { min, sec } = oldItem;
+      sec -= 1;
+      if (sec < 0) {
+        if (min <= 0) {
+          sec = 0;
+          min = 0;
+        } else {
+          sec = 59;
+          min -= 1;
+        }
       }
+      const newDate = [...todoDate.slice(0, index), { ...oldItem, min, sec }, ...todoDate.slice(index + 1)];
       return { todoDate: newDate };
     });
   };
