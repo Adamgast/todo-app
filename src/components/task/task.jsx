@@ -24,18 +24,18 @@ class Task extends Component {
     }
   }
 
-  pauseFn = () => {
-    const { onEditTimerId } = this.props;
-    onEditTimerId(0);
-    clearInterval(this.timer);
-    this.setState({ pause: true, play: false });
-  };
-
-  playFn = () => {
+  startTimer = () => {
     const { onUploadTimer, onEditTimerId } = this.props;
     this.timer = setInterval(onUploadTimer, 1000);
     onEditTimerId(this.timer);
     this.setState({ pause: false, play: true });
+  };
+
+  stopTimer = () => {
+    const { onEditTimerId } = this.props;
+    clearInterval(this.timer);
+    onEditTimerId(0);
+    this.setState({ pause: true, play: false });
   };
 
   handleDeleteItem = () => {
@@ -59,8 +59,14 @@ class Task extends Component {
     }
   };
 
+  handleChangeDone = () => {
+    const { onToggleDone } = this.props;
+    if (this.timer) this.stopTimer();
+    onToggleDone();
+  };
+
   render() {
-    const { todo, onToggleDone, onToggleEdit } = this.props;
+    const { todo, onToggleEdit } = this.props;
     const { id, edit, done, label, date, min, sec } = todo;
     const { labelState, play, pause } = this.state;
 
@@ -73,7 +79,7 @@ class Task extends Component {
     return (
       <div>
         <div className="view">
-          <input id={id} className="toggle" type="checkbox" checked={done} onChange={onToggleDone} />
+          <input id={id} className="toggle" type="checkbox" checked={done} onChange={this.handleChangeDone} />
           <label htmlFor={id}>
             <span className="title">{label}</span>
             <span className="description">
@@ -82,14 +88,14 @@ class Task extends Component {
                 type="button"
                 aria-label="play button"
                 disabled={play}
-                onClick={this.playFn}
+                onClick={this.startTimer}
               />
               <button
                 className={`icon icon-pause ${pause ? 'hidden' : ''}`}
                 type="button"
                 aria-label="pause button"
                 disabled={pause}
-                onClick={this.pauseFn}
+                onClick={this.stopTimer}
               />
               <span className="timer">
                 {min.toString().padStart(2, '0')}:{sec.toString().padStart(2, '0')}

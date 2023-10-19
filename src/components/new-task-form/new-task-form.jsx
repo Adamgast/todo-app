@@ -30,18 +30,20 @@ export default class NewTaskForm extends Component {
     });
   };
 
-  render() {
+  handleSubmit = (e) => {
     const { onAdded } = this.props;
     const { label, min, sec } = this.state;
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      if (label.trim()) {
-        onAdded(label, min, sec);
-      }
-      this.setState({ label: '', min: '', sec: '' });
-    };
+    if (label.trim() && (min.trim() || sec.trim())) {
+      onAdded(label, min, sec);
+    }
+    this.setState({ label: '', min: '', sec: '' });
+    e.preventDefault();
+  };
+
+  render() {
+    const { label, min, sec } = this.state;
     return (
-      <form className="new-todo-form" onSubmit={handleSubmit}>
+      <form className="new-todo-form" onSubmit={this.handleSubmit}>
         <input
           onChange={this.handleLabelChange}
           className="new-todo"
