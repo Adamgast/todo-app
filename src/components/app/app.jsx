@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState } from 'react';
 
 import Footer from '../footer/footer';
 import TaskList from '../task-list/task-list';
@@ -6,37 +6,32 @@ import NewTaskForm from '../new-task-form/new-task-form';
 
 import './app.css';
 
-export default class App extends Component {
-  maxId = 100;
+function App() {
+  const [todoDate, setTodoDate] = useState([]);
+  const [filter, setFilter] = useState('ALL');
 
-  constructor() {
-    super();
-    this.state = {
-      todoDate: [],
-      filter: 'ALL',
-    };
-  }
+  const changeFilter = (filterName) => setFilter(filterName);
 
-  changeFilter = (filterName) => {
-    this.setState({ filter: filterName });
+  const searchIdxItem = (arr, id) => arr.findIndex((item) => item.id === id);
+
+  const toggleProperty = (arr, id, propName) => {
+    const index = searchIdxItem(arr, id);
+    const oldItem = arr[index];
+    return [...arr.slice(0, index), { ...oldItem, [propName]: !oldItem[propName] }, ...arr.slice(index + 1)];
   };
 
-  onToggleEdit = (id) => {
-    this.setState(({ todoDate }) => ({
-      todoDate: this.toggleProperty(todoDate, id, 'edit'),
-    }));
+  const onToggleEdit = (id) => {
+    setTodoDate((prevTodoDate) => toggleProperty(prevTodoDate, id, 'edit'));
   };
 
-  onToggleDone = (id) => {
-    this.setState(({ todoDate }) => ({
-      todoDate: this.toggleProperty(todoDate, id, 'done'),
-    }));
+  const onToggleDone = (id) => {
+    setTodoDate((prevTodoDate) => toggleProperty(prevTodoDate, id, 'done'));
   };
 
-  uploadTimer = (id) => {
-    this.setState(({ todoDate }) => {
-      const index = this.searchIdxItem(todoDate, id);
-      const oldItem = todoDate[index];
+  const uploadTimer = (id) => {
+    setTodoDate((prevTodoDate) => {
+      const index = searchIdxItem(prevTodoDate, id);
+      const oldItem = prevTodoDate[index];
       let { min, sec } = oldItem;
       sec -= 1;
       if (sec < 0) {
@@ -48,79 +43,30 @@ export default class App extends Component {
           min -= 1;
         }
       }
-      const newDate = [...todoDate.slice(0, index), { ...oldItem, min, sec }, ...todoDate.slice(index + 1)];
-      return { todoDate: newDate };
+      const newDate = [...prevTodoDate.slice(0, index), { ...oldItem, min, sec }, ...prevTodoDate.slice(index + 1)];
+      return newDate;
     });
   };
 
-  editTimerId = (id, timerId) => {
-    this.setState(({ todoDate }) => {
-      const index = this.searchIdxItem(todoDate, id);
-      const oldItem = todoDate[index];
-      const newDate = [...todoDate.slice(0, index), { ...oldItem, timerId }, ...todoDate.slice(index + 1)];
-      return { todoDate: newDate };
+  const editTimerId = (id, timerId) => {
+    setTodoDate((prevTodoDate) => {
+      const index = searchIdxItem(prevTodoDate, id);
+      const oldItem = prevTodoDate[index];
+      const newDate = [...prevTodoDate.slice(0, index), { ...oldItem, timerId }, ...prevTodoDate.slice(index + 1)];
+      return newDate;
     });
   };
 
-  addItem = (label, min, sec) => {
-    this.setState(({ todoDate }) => {
-      const newDate = [...todoDate, this.createToDoItem(label, min, sec)];
-      return { todoDate: newDate };
-    });
+  const getId = () => {
+    const date = Date.now();
+    const random = Math.floor(Math.random() * 1000);
+    const newId = parseInt(`${date}${random}`, 10);
+    return newId;
   };
 
-  editItem = (id, label) => {
-    this.setState(({ todoDate }) => {
-      const index = this.searchIdxItem(todoDate, id);
-      const oldItem = todoDate[index];
-      const newDate = [
-        ...todoDate.slice(0, index),
-        { ...oldItem, label, edit: !oldItem.edit },
-        ...todoDate.slice(index + 1),
-      ];
-      return { todoDate: newDate };
-    });
-  };
-
-  deleteItem = (id) => {
-    this.setState(({ todoDate }) => {
-      const index = this.searchIdxItem(todoDate, id);
-      const newDate = [...todoDate.slice(0, index), ...todoDate.slice(index + 1)];
-      return { todoDate: newDate };
-    });
-  };
-
-  deleteCompleted = () => {
-    this.setState(({ todoDate }) => {
-      const activeItems = todoDate.filter((el) => el.done === false);
-      return {
-        todoDate: activeItems,
-      };
-    });
-  };
-
-  filteredDate = () => {
-    const { todoDate, filter } = this.state;
-    return todoDate.filter((item) => {
-      if (filter === 'ALL') {
-        return true;
-      }
-      if (filter === 'Completed') {
-        return item.done === true;
-      }
-      return item.done === false;
-    });
-  };
-
-  // eslint-disable-next-line class-methods-use-this
-  searchIdxItem(arr, id) {
-    return arr.findIndex((item) => item.id === id);
-  }
-
-  createToDoItem(label, min, sec) {
-    return {
-      // eslint-disable-next-line no-plusplus
-      id: this.maxId++,
+  const addItem = (label, min, sec) => {
+    const newItem = {
+      id: getId(),
       label,
       done: false,
       edit: false,
@@ -129,43 +75,74 @@ export default class App extends Component {
       min: Number(min),
       sec: Number(sec),
     };
-  }
+    setTodoDate((prevTodoDate) => {
+      const newDate = [...prevTodoDate, newItem];
+      return newDate;
+    });
+  };
 
-  toggleProperty(arr, id, propName) {
-    const index = this.searchIdxItem(arr, id);
-    const oldItem = arr[index];
-    return [...arr.slice(0, index), { ...oldItem, [propName]: !oldItem[propName] }, ...arr.slice(index + 1)];
-  }
+  const editItem = (id, label) => {
+    setTodoDate((prevTodoDate) => {
+      const index = searchIdxItem(prevTodoDate, id);
+      const oldItem = prevTodoDate[index];
+      const newDate = [
+        ...prevTodoDate.slice(0, index),
+        { ...oldItem, label, edit: !oldItem.edit },
+        ...prevTodoDate.slice(index + 1),
+      ];
+      return newDate;
+    });
+  };
 
-  render() {
-    const { todoDate, filter } = this.state;
-    const todoCount = todoDate.filter((el) => el.done === false).length;
+  const deleteItem = (id) => {
+    setTodoDate((prevTodoDate) => {
+      const index = searchIdxItem(prevTodoDate, id);
+      const newDate = [...prevTodoDate.slice(0, index), ...prevTodoDate.slice(index + 1)];
+      return newDate;
+    });
+  };
 
-    return (
-      <section className="todoapp">
-        <header className="header">
-          <h1>Todos</h1>
-          <NewTaskForm onAdded={this.addItem} />
-        </header>
-        <section className="main">
-          <TaskList
-            todos={this.filteredDate()}
-            onDeleted={this.deleteItem}
-            onEdited={this.editItem}
-            onToggleEdit={this.onToggleEdit}
-            onToggleDone={this.onToggleDone}
-            onUploadTimer={this.uploadTimer}
-            onEditTimerId={this.editTimerId}
-          />
+  const deleteCompleted = () => {
+    setTodoDate((prevTodoDate) => {
+      const activeItems = prevTodoDate.filter((el) => el.done === false);
+      return activeItems;
+    });
+  };
 
-          <Footer
-            todoCount={todoCount}
-            onClear={this.deleteCompleted}
-            filter={filter}
-            onChangeFilter={this.changeFilter}
-          />
-        </section>
+  const filteredDate = () =>
+    todoDate.filter((item) => {
+      if (filter === 'ALL') {
+        return true;
+      }
+      if (filter === 'Completed') {
+        return item.done === true;
+      }
+      return item.done === false;
+    });
+
+  const todoCount = todoDate.filter((el) => el.done === false).length;
+
+  return (
+    <section className="todoapp">
+      <header className="header">
+        <h1>Todos</h1>
+        <NewTaskForm onAdded={addItem} />
+      </header>
+      <section className="main">
+        <TaskList
+          todos={filteredDate()}
+          onDeleted={deleteItem}
+          onEdited={editItem}
+          onToggleEdit={onToggleEdit}
+          onToggleDone={onToggleDone}
+          onUploadTimer={uploadTimer}
+          onEditTimerId={editTimerId}
+        />
+
+        <Footer todoCount={todoCount} onClear={deleteCompleted} filter={filter} onChangeFilter={changeFilter} />
       </section>
-    );
-  }
+    </section>
+  );
 }
+
+export default App;

@@ -1,115 +1,96 @@
 import { formatDistanceToNow } from 'date-fns';
 import PropTypes from 'prop-types';
-import { Component } from 'react';
+import { useState } from 'react';
 import './task.css';
 
-class Task extends Component {
-  constructor(props) {
-    super(props);
-    this.timer = props.todo.timerId;
-    this.timeout = null;
-    this.state = {
-      labelState: props.todo.label,
-      finalDelete: false,
-      pause: Boolean(!this.timer),
-      play: Boolean(this.timer),
-    };
-  }
+function Task({ todo, onDeleted, onEdited, onToggleDone, onToggleEdit, onUploadTimer, onEditTimerId }) {
+  let { timerId } = todo;
 
-  componentWillUnmount() {
-    const { finalDelete } = this.state;
-    if (finalDelete) {
-      clearInterval(this.timer);
-      clearTimeout(this.timeout);
-    }
-  }
+  const [labelState, setLabelState] = useState(todo.label);
+  const [play, setPlay] = useState(Boolean(timerId));
+  const [pause, setPause] = useState(Boolean(!timerId));
 
-  startTimer = () => {
-    const { onUploadTimer, onEditTimerId } = this.props;
-    this.timer = setInterval(onUploadTimer, 1000);
-    onEditTimerId(this.timer);
-    this.setState({ pause: false, play: true });
+  const startTimer = () => {
+    timerId = setInterval(onUploadTimer, 1000);
+    onEditTimerId(timerId);
+    setPlay(true);
+    setPause(false);
   };
 
-  stopTimer = () => {
-    const { onEditTimerId } = this.props;
-    clearInterval(this.timer);
+  const stopTimer = () => {
+    clearInterval(timerId);
     onEditTimerId(0);
-    this.setState({ pause: true, play: false });
+    setPlay(false);
+    setPause(true);
   };
 
-  handleDeleteItem = () => {
-    const { onDeleted } = this.props;
-    this.setState({ finalDelete: true });
-    this.timeout = setTimeout(() => onDeleted(), 100);
+  const handleDeleteItem = () => {
+    if (timerId) stopTimer();
+    const timeout = setTimeout(() => {
+      onDeleted();
+      clearTimeout(timeout);
+    }, 100);
   };
 
-  handleChangeLabel = (e) => {
-    this.setState({ labelState: e.target.value });
+  const handleChangeLabel = (e) => {
+    setLabelState(e.target.value);
   };
 
-  handleSubmit = (e) => {
-    const { labelState } = this.state;
-    const { onEdited } = this.props;
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (labelState !== '') {
       onEdited(labelState);
     } else {
-      this.handleDeleteItem();
+      handleDeleteItem();
     }
   };
 
-  handleChangeDone = () => {
-    const { onToggleDone } = this.props;
-    if (this.timer) this.stopTimer();
+  const handleChangeDone = () => {
+    if (timerId) stopTimer();
     onToggleDone();
   };
 
-  render() {
-    const { todo, onToggleEdit } = this.props;
-    const { id, edit, done, label, date, min, sec } = todo;
-    const { labelState, play, pause } = this.state;
+  const { id, edit, done, label, date, min, sec } = todo;
 
-    const formElement = (
-      <form onSubmit={this.handleSubmit}>
-        <input onChange={this.handleChangeLabel} type="text" className="edit" value={labelState} />
-      </form>
-    );
+  const formElement = (
+    <form onSubmit={handleSubmit}>
+      <input onChange={handleChangeLabel} type="text" className="edit" value={labelState} />
+    </form>
+  );
 
-    return (
-      <div>
-        <div className="view">
-          <input id={id} className="toggle" type="checkbox" checked={done} onChange={this.handleChangeDone} />
-          <label htmlFor={id}>
-            <span className="title">{label}</span>
-            <span className="description">
-              <button
-                className={`icon icon-play ${play ? 'hidden' : ''}`}
-                type="button"
-                aria-label="play button"
-                disabled={play}
-                onClick={this.startTimer}
-              />
-              <button
-                className={`icon icon-pause ${pause ? 'hidden' : ''}`}
-                type="button"
-                aria-label="pause button"
-                disabled={pause}
-                onClick={this.stopTimer}
-              />
-              <span className="timer">
-                {min.toString().padStart(2, '0')}:{sec.toString().padStart(2, '0')}
-              </span>
+  return (
+    <div>
+      <div className="view">
+        <input id={id} className="toggle" type="checkbox" checked={done} onChange={handleChangeDone} />
+        <label htmlFor={id}>
+          <span className="title">{label}</span>
+          <span className="description">
+            <button
+              className={`icon icon-play ${play ? 'hidden' : ''}`}
+              type="button"
+              aria-label="play button"
+              disabled={play}
+              onClick={startTimer}
+            />
+            <button
+              className={`icon icon-pause ${pause ? 'hidden' : ''}`}
+              type="button"
+              aria-label="pause button"
+              disabled={pause}
+              onClick={stopTimer}
+            />
+            <span className="timer">
+              {min.toString().padStart(2, '0')}:{sec.toString().padStart(2, '0')}
             </span>
-            <span className="description">created {formatDistanceToNow(date, { includeSeconds: true })} ago</span>
-          </label>
-          <button aria-label="edit" type="button" className="icon icon-edit" onClick={onToggleEdit} />
-          <button aria-label="delete" type="button" className="icon icon-destroy" onClick={this.handleDeleteItem} />
-        </div>
-        {edit ? formElement : null}
+          </span>
+          <span className="description">created {formatDistanceToNow(date, { includeSeconds: true })} ago</span>
+        </label>
+        <button aria-label="edit" type="button" className="icon icon-edit" onClick={onToggleEdit} />
+        <button aria-label="delete" type="button" className="icon icon-destroy" onClick={handleDeleteItem} />
       </div>
-    );
-  }
+      {edit ? formElement : null}
+    </div>
+  );
 }
 
 Task.defaultProps = {
